@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Korepetycje z Matematyki – Student AGH</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --bg:          #E8E8E8;
+      --paper:       #F2F0EB;
+      --block:       #FAFAF8;
+      --ink:         #1C1C2E;
+      --ink-soft:    #3D3D55;
+      --ink-muted:   #8A8AAA;
+      --accent:      #2C4A8F;
+      --accent-soft: #DDE6F7;
+      --accent-warm: #B85C2A;
+      --grid:        rgba(44, 74, 143, 0.07);
+      --border:      rgba(44, 74, 143, 0.12);
+      --shadow:      rgba(28, 28, 46, 0.07);
+      --red-margin:  rgba(184, 92, 42, 0.18);
+    }
+
+    [data-theme="dark"] {
+      --bg:          #1A1A22;
+      --paper:       #22232E;
+      --block:       #2A2C3A;
+      --ink:         #E8E4D8;
+      --ink-soft:    #B8B4A8;
+      --ink-muted:   #6A6A88;
+      --accent:      #7FA8F0;
+      --accent-soft: #1E2840;
+      --accent-warm: #E08050;
+      --grid:        rgba(127, 168, 240, 0.06);
+      --border:      rgba(127, 168, 240, 0.10);
+      --shadow:      rgba(0, 0, 0, 0.30);
+      --red-margin:  rgba(224, 128, 80, 0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      /* Kratka w tle całej strony – bardzo subtelna */
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 28px 28px;
+      color: var(--ink);
+      min-height: 100vh;
+      transition: background-color 0.35s, color 0.35s;
+    }
+
+    /* ─── TOGGLE ─── */
+    .theme-bar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--paper);
+      border-bottom: 1px solid var(--border);
+      padding: 0.55rem 2rem;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.6rem;
+      backdrop-filter: blur(6px);
+      transition: background 0.35s;
+    }
+
+    .theme-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--ink-muted);
+      letter-spacing: 0.04em;
+    }
+
+    .toggle-switch {
+      width: 42px;
+      height: 23px;
+      background: var(--ink-muted);
+      border-radius: 12px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.3s;
+      flex-shrink: 0;
+    }
+
+    [data-theme="dark"] .toggle-switch { background: var(--accent); }
+
+    .toggle-knob {
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 17px; height: 17px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px;
+    }
+
+    [data-theme="dark"] .toggle-knob { transform: translateX(19px); }
+
+    /* ─── WRAPPER STRONY ─── */
+    .page {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 5rem;
+    }
+
+    /* ─── SEKCJE-BLOKI ─── */
+    .block {
+      background: var(--block);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      box-shadow: 0 2px 10px var(--shadow);
+      margin-bottom: 1.4rem;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.35s, border-color 0.35s, box-shadow 0.35s;
+    }
+
+    /* Czerwona linia marginesu po lewej */
+    .block::before {
+      content: '';
+      position: absolute;
+      left: 48px;
+      top: 0; bottom: 0;
+      width: 1.5px;
+      background: var(--red-margin);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Kratka wewnątrz bloku */
+    .block-grid {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+
+    .block-inner {
+      position: relative;
+      z-index: 2;
+      padding: 2rem 2.2rem 2rem 3.8rem;
+    }
+
+    @media (max-width: 600px) {
+      .block-inner { padding: 1.5rem 1.2rem 1.5rem 1.5rem; }
+      .block::before { display: none; }
+      .page { padding: 1.5rem 0.8rem 4rem; }
+    }
+
+    /* ─── HEADER-BLOK ─── */
+    .block-header {
+      background: var(--paper);
+      border-bottom: 3px solid var(--accent);
+    }
+
+    .block-header .block-inner {
+      padding-top: 2.5rem;
+      padding-bottom: 2.2rem;
+    }
+
+    .eyebrow {
+      font-family: 'Caveat', cursive;
+      font-size: 1.05rem;
+      color: var(--accent-warm);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-family: 'Lora', serif;
+      font-size: clamp(2rem, 5vw, 2.8rem);
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.18;
+      letter-spacing: -0.01em;
+    }
+
+    h1 em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .subtitle {
+      margin-top: 0.7rem;
+      font-size: 0.93rem;
+      color: var(--ink-muted);
+      font-family: 'Lora', serif;
+      font-style: italic;
+    }
+
+    .stamp {
+      position: absolute;
+      right: 2rem; top: 1.5rem;
+      width: 76px; height: 76px;
+      border: 2.5px solid var(--accent);
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      opacity: 0.14;
+      transform: rotate(-7deg);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    [data-theme="dark"] .stamp { opacity: 0.20; }
+
+    .stamp span {
+      font-family: 'Lora', serif;
+      font-size: 0.52rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-align: center;
+      line-height: 1.4;
+    }
+
+    /* ─── NAGŁÓWKI SEKCJI ─── */
+    h2 {
+      font-family: 'Lora', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    h2::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    p {
+      font-size: 0.93rem;
+      line-height: 1.84;
+      color: var(--ink-soft);
+    }
+
+    p + p { margin-top: 0.75rem; }
+
+    strong { color: var(--ink); font-weight: 600; }
+    em { color: var(--ink-soft); }
+
+    /* ─── ACHIEVEMENT ─── */
+    .achievement {
+      margin-top: 1.1rem;
+      background: linear-gradient(to right, rgba(184,92,42,0.08), transparent);
+      border-left: 3px solid var(--accent-warm);
+      padding: 0.85rem 1.1rem;
+      border-radius: 0 3px 3px 0;
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+    }
+
+    .achievement strong { color: var(--accent-warm); font-style: normal; }
+
+    /* ─── ODZNAKI ─── */
+    .badges {
+      display: flex; flex-wrap: wrap; gap: 0.45rem;
+      margin-top: 1.1rem;
+    }
+
+    .badge {
+      font-size: 0.76rem; font-weight: 500;
+      padding: 0.28rem 0.7rem;
+      border-radius: 2px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid var(--border);
+    }
+
+    .badge.warm {
+      background: rgba(184,92,42,0.09);
+      color: var(--accent-warm);
+      border-color: rgba(184,92,42,0.18);
+    }
+
+    /* ─── KAFELKI STATYSTYK ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-item {
+      padding: 1.5rem 1.2rem;
+      text-align: center;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      z-index: 2;
+    }
+
+    .stat-item:nth-child(4n),
+    .stat-item:last-child { border-right: none; }
+
+    @media (max-width: 600px) {
+      .stat-item:nth-child(2n) { border-right: none; }
+      .stat-item:nth-child(3),
+      .stat-item:nth-child(4) { border-bottom: none; }
+    }
+
+    .stat-item:nth-child(n+5) { border-bottom: none; }
+
+    .stat-num {
+      font-family: 'Lora', serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+
+    /* ─── TABELA ─── */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      z-index: 2;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.87rem;
+    }
+
+    thead tr { background: var(--accent); }
+
+    thead th {
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      color: #fff;
+      padding: 0.78rem 1rem;
+      text-align: left;
+      font-size: 0.79rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    [data-theme="dark"] thead th { color: #E8E4D8; }
+
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:nth-child(even) { background: rgba(44,74,143,0.035); }
+    [data-theme="dark"] tbody tr:nth-child(even) { background: rgba(127,168,240,0.04); }
+    tbody tr:hover { background: var(--accent-soft); }
+
+    td {
+      padding: 0.75rem 1rem;
+      color: var(--ink-soft);
+      vertical-align: middle;
+    }
+
+    td:first-child {
+      font-weight: 600;
+      color: var(--ink);
+      font-family: 'Lora', serif;
+    }
+
+    .price-cell {
+      font-family: 'Lora', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--accent);
+      white-space: nowrap;
+    }
+
+    .lvl {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 500;
+      padding: 0.12rem 0.45rem;
+      border-radius: 2px;
+      margin-top: 0.2rem;
+      letter-spacing: 0.03em;
+    }
+
+    .lvl-a { background: rgba(44,74,143,0.10); color: var(--accent); }
+    .lvl-b { background: rgba(44,74,143,0.16); color: var(--accent); }
+    .lvl-c { background: rgba(184,92,42,0.13); color: var(--accent-warm); }
+    .lvl-d { background: rgba(184,92,42,0.20); color: var(--accent-warm); }
+    .lvl-e { background: rgba(60,160,60,0.14); color: #3a8a3a; }
+    [data-theme="dark"] .lvl-e { color: #7ecf7e; }
+
+    .table-note {
+      font-size: 0.78rem;
+      color: var(--ink-muted);
+      font-style: italic;
+      padding: 0.75rem 1rem;
+      border-top: 1px solid var(--border);
+      position: relative; z-index: 2;
+    }
+
+    /* ─── KONTAKT ─── */
+    .contact-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+      position: relative; z-index: 2;
+    }
+
+    .contact-icon { font-size: 2.2rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+    .contact-cta {
+      font-family: 'Lora', serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .contact-sub {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      margin-top: 0.3rem;
+      line-height: 1.6;
+    }
+
+    .contact-note {
+      font-family: 'Caveat', cursive;
+      font-size: 0.92rem;
+      color: var(--ink-muted);
+      margin-top: 1rem;
+      position: relative; z-index: 2;
+    }
+
+    /* ─── FOOTER ─── */
+    .footer-block {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .footer-block::before { display: none; }
+
+    .handwriting {
+      font-family: 'Caveat', cursive;
+      font-size: 1.1rem;
+      color: var(--ink-muted);
+    }
+
+    .footer-note {
+      font-size: 0.75rem;
+      color: var(--ink-muted);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── PASEK TOGGLE ─── -->
+<div class="theme-bar">
+  <span class="theme-label" id="theme-label">Ciemny motyw</span>
+  <div class="toggle-switch" id="toggle" role="switch" aria-checked="false" tabindex="0" title="Przełącz motyw">
+    <span class="toggle-knob" id="knob">🌙</span>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- ─── NAGŁÓWEK ─── -->
+  <div class="block block-header">
+    <div class="block-grid" aria-hidden="true"></div>
+    <div class="stamp" aria-hidden="true">
+      <span>AKADEMIA<br/>GÓRNICZO-<br/>HUTNICZA<br/>★ AGH ★</span>
+    </div>
+    <div class="block-inner">
+      <span class="eyebrow">✏️ Prywatne korepetycje</span>
+      <h1>Matematyka<br/>z <em>pasją i wynikami</em></h1>
+      <p class="subtitle">Student AGH · Kraków · od 2023 roku</p>
+    </div>
+  </div>
+
+  <!-- ─── O MNIE ─── -->
+  <div class="block">
+    <div class="block-grid" aria-hidden="true"></div>
+    <div class="block-inner">
+      <h2>👤 O mnie</h2>
+      <p>
+        Jestem studentem kierunku <strong>Automatyka Przemysłowa i Robotyka</strong> na <strong>Akademii Górniczo-Hutniczej im. Stanisława Staszica w Krakowie</strong> — jednej z najlepszych uczelni technicznych w Polsce. Matematyka to dla mnie nie tylko obowiązek akademicki, ale przede wszystkim <strong>lekkie hobby</strong> i codzienna przyjemność: lubię szukać eleganckich rozwiązań i odkrywać wzorce, które na pierwszy rzut oka nie są oczywiste.
+      </p>
+      <p>
+        Udzielam korepetycji od ponad dwóch lat. Pracowałem z uczniami na różnych poziomach — od szkoły podstawowej aż po studentów pierwszego roku. Potrafię współpracować i <strong>dogadać się z osobami mającymi trudności</strong> oraz wytłumaczyć materiał w przystępny sposób.
+      </p>
+
+      <div class="badges">
+        <span class="badge">Student AGH</span>
+        <span class="badge">Matematyka stosowana</span>
+        <span class="badge warm">🏅 Złoty Indeks PK</span>
+        <span class="badge">2+ lata doświadczenia</span>
+        <span class="badge">Kraków</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── STATYSTYKI ─── -->
+  <div class="block" style="overflow: hidden;">
+    <div class="block-grid" aria-hidden="true"></div>
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-num">2+</div>
+        <div class="stat-label">lata udzielania korepetycji</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">🏅</div>
+        <div class="stat-label">Złoty Indeks PK z Matematyki</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">5</div>
+        <div class="stat-label">poziomów nauczania w ofercie</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">AGH</div>
+        <div class="stat-label">prestiżowa uczelnia techniczna</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── DLACZEGO WARTO ─── -->
+  <div class="block">
+    <div class="block-grid" aria-hidden="true"></div>
+    <div class="block-inner">
+      <h2>✨ Dlaczego warto?</h2>
+      <p>
+        Matematyka jest logiczna — to jej piękno, ale i pułapka. Bez solidnego fundamentu kolejne działy stają się coraz trudniejsze. Moim celem jest <strong>nie tylko pomoc w bieżącym zadaniu domowym</strong>, lecz budowanie trwałego rozumienia: uczeń ma wiedzieć, <em>dlaczego</em> coś działa, a nie jedynie <em>jak</em> to liczyć.
+      </p>
+      <p>
+        Każdy uczeń otrzymuje spersonalizowane podejście — inne metody działają na wzrokowców, inne na uczniów lubiących formalizm.
+      </p>
+    </div>
+  </div>
+
+  <!-- ─── CENNIK ─── -->
+  <div class="block">
+    <div class="block-grid" aria-hidden="true"></div>
+    <div class="block-inner" style="padding-bottom: 0;">
+      <h2>📋 Oferta i cennik</h2>
+      <p style="margin-bottom: 1.1rem;">
+        Zajęcia trwają <strong>60 minut</strong>. Cena uzależniona jest od poziomu zaawansowania materiału — poniżej pełna tabela oferty:
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Poziom</th>
+            <th>Dla kogo?</th>
+            <th>Zakres tematyczny</th>
+            <th>Cena / 60 min</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Szkoła podstawowa
+              <br/><span class="lvl lvl-a">kl. 4–8</span>
+            </td>
+            <td>Uczniowie SP</td>
+            <td>Ułamki, równania, geometria, proporcje, procenty, potęgi</td>
+            <td class="price-cell">60 zł</td>
+          </tr>
+          <tr>
+            <td>
+              Podstawa
+              <br/><span class="lvl lvl-b">poziom P</span>
+            </td>
+            <td>Maturzyści, poziom podstawowy</td>
+            <td>Funkcje, trygonometria, ciągi, prawdopodobieństwo, statystyka</td>
+            <td class="price-cell">70 zł</td>
+          </tr>
+          <tr>
+            <td>
+              Rozszerzenie
+              <br/><span class="lvl lvl-c">poziom R</span>
+            </td>
+            <td>Maturzyści, poziom rozszerzony</td>
+            <td>Geometria analityczna, kombinatoryka, powtórki do matury</td>
+            <td class="price-cell">80 zł</td>
+          </tr>
+          <tr>
+            <td>
+              Studia
+              <br/><span class="lvl lvl-d">I rok</span>
+            </td>
+            <td>Studenci pierwszego roku</td>
+            <td>Analiza matematyczna, algebra liniowa, rachunek różniczkowy</td>
+            <td class="price-cell">90 zł</td>
+          </tr>
+          <tr>
+            <td>
+              Poprawka matury
+              <br/><span class="lvl lvl-e">wakacje</span>
+            </td>
+            <td>Kandydaci zdający poprawkę w sierpniu</td>
+            <td>Intensywne powtórzenie, taktyka pisania, arkusze próbne</td>
+            <td class="price-cell">100 zł</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── FORMA ZAJĘĆ ─── -->
+  <div class="block">
+    <div class="block-grid" aria-hidden="true"></div>
+    <div class="block-inner">
+      <h2>💻 Forma zajęć</h2>
+      <p>
+        Zajęcia prowadzone są <strong>zdalnie</strong> — głównie przez Discord lub inną platformę do indywidualnego ustalenia. Inna forma zajęć jest również możliwa <strong>do dogadania</strong>.
+      </p>
+    </div>
+  </div>
+
+  <!-- ─── KONTAKT ─── -->
+  <div class="block">
+    <div class="block-grid" aria-hidden="true"></div>
+    <div class="block-inner">
+      <h2>📬 Umów zajęcia</h2>
+      <div class="contact-row">
+        <div class="contact-icon">✉️</div>
+        <div>
+          <div class="contact-cta">Napisz, żeby ustalić termin pierwszych zajęć</div>
+          <p class="contact-sub">Odpowiadam zwykle w ciągu kilku godzin. Chętnie powiem więcej o ofercie i dostępnych terminach.</p>
+        </div>
+      </div>
+      <p class="contact-note">— Dostępność: dni powszednie popołudniami oraz weekendy · Kraków lub online</p>
+    </div>
+  </div>
+
+  <!-- ─── FOOTER ─── -->
+  <div class="footer-block">
+    <span class="footer-note">Student AGH · Kraków · rok szkolny 2025/2026</span>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+  const html   = document.documentElement;
+  const toggle = document.getElementById('toggle');
+  const knob   = document.getElementById('knob');
+  const label  = document.getElementById('theme-label');
+
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  let dark = prefersDark;
+
+  function apply(d) {
+    dark = d;
+    html.setAttribute('data-theme', d ? 'dark' : 'light');
+    knob.textContent  = d ? '☀️' : '🌙';
+    label.textContent = d ? 'Jasny motyw' : 'Ciemny motyw';
+    toggle.setAttribute('aria-checked', String(d));
+  }
+
+  apply(dark);
+
+  toggle.addEventListener('click', () => apply(!dark));
+  toggle.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); apply(!dark); } });
+</script>
+
+</body>
+</html>
